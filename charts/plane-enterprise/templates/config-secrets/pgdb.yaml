@@ -9,7 +9,7 @@ metadata:
   name: {{ .Release.Name }}-pgdb-secrets
 stringData:
   POSTGRES_USER: {{ .Values.env.pgdb_username | default "plane" | quote }}
-  POSTGRES_PASSWORD: {{ .Values.env.pgdb_password | default "plane" | quote }}
+  POSTGRES_PASSWORD: {{ .Values.env.pgdb_password | required "env.pgdb_password is required when services.postgres.local_setup=true" | quote }}
   POSTGRES_DB: {{ .Values.env.pgdb_name | default "plane" | quote }}
 {{- end }}
 ---

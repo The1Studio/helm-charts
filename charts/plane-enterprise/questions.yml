@@ -261,7 +261,8 @@ questions:
   - variable: env.live_server_secret_key
     label: "Live Server Secret Key"
     type: string
-    default: "htbqvBJAgpm9bzvf3r4urJer0ENReatceh"
+    required: true
+    default: ""
 
 - variable: services.silo.enabled
   label: "Install Silo Service"
@@ -321,11 +322,13 @@ questions:
   - variable: env.silo_envs.hmac_secret_key
     label: "Silo HMAC Secret Key"
     type: string
+    required: true
     default: ""
   - variable: env.silo_envs.aes_secret_key
     label: "Silo AES Secret Key"
     type: string
-    default: "dsOdt7YrvxsTIFJ37pOaEVvLxN8KGBCr"
+    required: true
+    default: ""
   - variable: env.silo_envs.cors_allowed_origins
     label: "Silo CORS Allowed Origins"
     type: string
@@ -500,7 +503,7 @@ questions:
     label: "Random Secret Key"
     type: string
     required: true
-    default: "60gp0byfz2dvffa45cxl20p1scy9xbpf6d8c5y0geejgkyp1b5"
+    default: ""
   - variable: env.api_key_rate_limit
     label: "API Key Rate Limit"
     type: string
@@ -870,7 +873,8 @@ questions:
   - variable: env.pi_envs.internal_secret
     label: "Plane AI (PI) Internal Secret"
     type: string
-    default: "tyfvfqvBJAgpm9bzvf3r4urJer0Ehfdubk"
+    required: true
+    default: ""
   - variable: env.pi_envs.log_level
     label: "Log Level"
     type: string
@@ -1134,7 +1138,8 @@ questions:
   - variable: env.pgdb_password
     label: "Password"
     type: password
-    default: "plane"
+    required: true
+    default: ""
     show_if: "services.postgres.local_setup=true"
   - variable: env.pgdb_name
     label: "DB Name"
@@ -1201,7 +1206,8 @@ questions:
   - variable: services.opensearch.password
     label: "Password"
     type: password
-    default: "Secure@Pass#123!%^&*"
+    required: true
+    default: ""
     show_if: "services.opensearch.local_setup=true"
   - variable: services.opensearch.assign_cluster_ip
     label: "Assign Cluster IP"
@@ -1279,7 +1285,8 @@ questions:
   - variable: services.rabbitmq.default_password
     label: "Password"
     type: password
-    default: "plane"
+    required: true
+    default: ""
     show_if: "services.rabbitmq.local_setup=true"
   - variable: services.rabbitmq.external_rabbitmq_url
     label: "Remote URL"
@@ -1318,7 +1325,8 @@ questions:
   - variable: services.minio.root_password
     label: "Root Password"
     type: password
-    default: "password"
+    required: true
+    default: ""
     show_if: "services.minio.local_setup=true"
   - variable: services.minio.volumeSize
     label: "Volume Size"

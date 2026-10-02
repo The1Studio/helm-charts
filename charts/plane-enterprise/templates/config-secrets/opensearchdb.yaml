@@ -10,8 +10,8 @@ stringData:
   OPENSEARCH_ENABLED: "1"
   OPENSEARCH_URL: "http://{{ .Release.Name }}-opensearch.{{ .Release.Namespace }}.svc.cluster.local:9200"
   OPENSEARCH_USERNAME: {{ .Values.services.opensearch.username | default "plane" | quote }}
-  OPENSEARCH_PASSWORD: {{ .Values.services.opensearch.password | default "Secure@Pass#123!%^&*" | quote }}
-  OPENSEARCH_INITIAL_ADMIN_PASSWORD: {{ .Values.services.opensearch.password | default "Secure@Pass#123!%^&*" | quote }}
+  OPENSEARCH_PASSWORD: {{ .Values.services.opensearch.password | required "services.opensearch.password is required when services.opensearch.local_setup=true" | quote }}
+  OPENSEARCH_INITIAL_ADMIN_PASSWORD: {{ .Values.services.opensearch.password | required "services.opensearch.password is required when services.opensearch.local_setup=true" | quote }}
   OPENSEARCH_INDEX_PREFIX: {{ .Values.env.opensearch_index_prefix | default "" | quote }}
   OPENSEARCH_EMBEDDING_DIMENSION: {{ .Values.env.opensearch_embedding_dimension | default 1536 | quote }}
   {{- else if .Values.env.opensearch_remote_url }}
@@ -47,7 +47,7 @@ data:
 
     # Hardcoded values
     export OPENSEARCH_USER=${OPENSEARCH_USER:-"plane"}
-    export OPENSEARCH_PASSWORD=${OPENSEARCH_PASSWORD:-"Secure@Pass#123!%^&*"}
+    export OPENSEARCH_PASSWORD=${OPENSEARCH_PASSWORD:?OPENSEARCH_PASSWORD must be set}
 
     echo "=== Configuration ==="
     echo "USER: ${OPENSEARCH_USER}"

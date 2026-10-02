@@ -5,3 +5,15 @@ test-helm.yaml
 tests/*
 test.yaml
 test-*.yaml
+
+# Never commit credentials / secret material
+.env
+.env.*
+*.pem
+*.key
+*.keystore
+*.jks
+*.p12
+*.pfx
+secrets.yaml
+secrets.yml

@@ -8,7 +8,7 @@ metadata:
   name: {{ .Release.Name }}-pi-api-secrets
 stringData:
   {{- if .Values.services.postgres.local_setup }}
-  PLANE_PI_DATABASE_URL: "postgresql://{{ .Values.env.pgdb_username }}:{{ .Values.env.pgdb_password }}@{{ .Release.Name }}-pgdb.{{ .Release.Namespace }}.svc.cluster.local/{{ .Values.env.pg_pi_db_name }}"
+  PLANE_PI_DATABASE_URL: "postgresql://{{ .Values.env.pgdb_username }}:{{ .Values.env.pgdb_password | required "env.pgdb_password is required when services.postgres.local_setup=true" }}@{{ .Release.Name }}-pgdb.{{ .Release.Namespace }}.svc.cluster.local/{{ .Values.env.pg_pi_db_name }}"
   {{- else if .Values.env.pg_pi_db_remote_url }}
   PLANE_PI_DATABASE_URL: {{ .Values.env.pg_pi_db_remote_url}}
   {{- else }}
@@ -18,7 +18,7 @@ stringData:
   {{- if .Values.env.pi_envs.follower_postgres_uri }}
   FOLLOWER_POSTGRES_URI: {{ .Values.env.pi_envs.follower_postgres_uri | quote }}
   {{- else if .Values.services.postgres.local_setup }}
-  FOLLOWER_POSTGRES_URI: "postgresql://{{ .Values.env.pgdb_username }}:{{ .Values.env.pgdb_password }}@{{ .Release.Name }}-pgdb.{{ .Release.Namespace }}.svc.cluster.local/{{ .Values.env.pgdb_name }}"
+  FOLLOWER_POSTGRES_URI: "postgresql://{{ .Values.env.pgdb_username }}:{{ .Values.env.pgdb_password | required "env.pgdb_password is required when services.postgres.local_setup=true" }}@{{ .Release.Name }}-pgdb.{{ .Release.Namespace }}.svc.cluster.local/{{ .Values.env.pgdb_name }}"
   {{- else if .Values.env.pgdb_remote_url }}
   FOLLOWER_POSTGRES_URI: {{ .Values.env.pgdb_remote_url | quote }}
   {{- else }}  
@@ -26,7 +26,7 @@ stringData:
   {{- end }}
 
   {{- if .Values.services.rabbitmq.local_setup }}
-  AMQP_URL: "amqp://{{ .Values.services.rabbitmq.default_user }}:{{ .Values.services.rabbitmq.default_password }}@{{ .Release.Name }}-rabbitmq.{{ .Release.Namespace }}.svc.cluster.local/"
+  AMQP_URL: "amqp://{{ .Values.services.rabbitmq.default_user }}:{{ .Values.services.rabbitmq.default_password | required "services.rabbitmq.default_password is required when services.rabbitmq.local_setup=true" }}@{{ .Release.Name }}-rabbitmq.{{ .Release.Namespace }}.svc.cluster.local/"
   {{- else if .Values.services.rabbitmq.external_rabbitmq_url }}
   AMQP_URL: {{ .Values.services.rabbitmq.external_rabbitmq_url | default "" | quote }}
   {{- else }}
@@ -61,7 +61,8 @@ stringData:
   BR_AWS_SESSION_TOKEN: {{ .Values.services.pi.ai_providers.embedding_model.aws_session_token | default "" | quote }}
   {{- end }}
 
-  AES_SECRET_KEY: {{ .Values.env.silo_envs.aes_secret_key | default "dsOdt7YrvxsTIFJ37pOaEVvLxN8KGBCr" | quote }}
+  AES_SECRET_KEY: {{ .Values.env.silo_envs.aes_secret_key | required "env.silo_envs.aes_secret_key is required when services.pi.enabled=true" | quote }}
+  PI_INTERNAL_SECRET: {{ .Values.env.pi_envs.internal_secret | required "env.pi_envs.internal_secret is required when services.pi.enabled=true" | quote }}
 {{- end }}
 ---
 
@@ -73,7 +74,7 @@ metadata:
   name: {{ .Release.Name }}-pi-api-vars
 data:
   DEBUG: {{ if .Values.env.pi_envs.debug | default false }} "1" {{- else -}} "0" {{ end }}
-  LOG_LEVEL: {{ .Values.env.pi_envs.log_level | default "DEBUG" | quote }}
+  LOG_LEVEL: {{ .Values.env.pi_envs.log_level | default "INFO" | quote }}
   FASTAPI_APP_HOST: "0.0.0.0"
   FASTAPI_APP_WORKERS: "1"
   {{- if or .Values.ssl.tls_secret_name (and .Values.ssl.createIssuer .Values.ssl.generateCerts) }}
@@ -89,8 +90,6 @@ data:
   {{- else }}
   PLANE_API_HOST: "http://{{ .Values.license.licenseDomain }}"
   {{- end }}
-
-  PI_INTERNAL_SECRET: {{ .Values.env.pi_envs.internal_secret | default "tyfvfqvBJAgpm9bzvf3r4urJer0Ehfdubk" | quote }}
 
   FEATURE_FLAG_SERVER_BASE_URL: "http://{{ .Release.Name }}-monitor.{{ .Release.Namespace }}.svc.cluster.local:8080"
   PI_BASE_PATH: "/pi"

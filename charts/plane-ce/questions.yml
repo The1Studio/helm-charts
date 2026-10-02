@@ -186,7 +186,8 @@ questions:
   - variable: env.live_server_secret_key
     label: "Live Server Secret Key"
     type: string
-    default: "htbqvBJAgpm9bzvf3r4urJer0ENReatceh"
+    required: true
+    default: ""
 
 - variable: api.image
   label: Backend Docker Image
@@ -244,7 +245,7 @@ questions:
     label: "Random Secret Key"
     type: string
     required: true
-    default: "60gp0byfz2dvffa45cxl20p1scy9xbpf6d8c5y0geejgkyp1b5"
+    default: ""
   - variable: env.api_key_rate_limit
     label: "API Key Rate Limit"
     type: string
@@ -380,7 +381,8 @@ questions:
   - variable: env.pgdb_password
     label: "Password"
     type: password
-    default: "plane"
+    required: true
+    default: ""
     show_if: "postgres.local_setup=true"
   - variable: env.pgdb_name
     label: "DB Name"
@@ -450,7 +452,8 @@ questions:
   - variable: rabbitmq.default_password
     label: "Password"
     type: password
-    default: "plane"
+    required: true
+    default: ""
     show_if: "rabbitmq.local_setup=true"
   - variable: rabbitmq.external_rabbitmq_url
     label: "Remote URL"
@@ -489,7 +492,8 @@ questions:
   - variable: minio.root_password
     label: "Root Password"
     type: password
-    default: "password"
+    required: true
+    default: ""
     show_if: "minio.local_setup=true"
   - variable: minio.storageClass
     label: "Storage Class"

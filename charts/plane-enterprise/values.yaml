@@ -36,6 +36,9 @@ airgapped:
 
 ingress:
   enabled: true
+  # WARNING: setting minioHost or rabbitmqHost exposes the MinIO console (:9090)
+  # and RabbitMQ management UI (:15672) on the public ingress. Only set these
+  # behind TLS and strong credentials — never expose them on an untrusted network.
   minioHost: ''
   rabbitmqHost: ''
   ingressClass: 'traefik'
@@ -137,7 +140,9 @@ services:
     volumeSize: 100Mi
     pullPolicy: IfNotPresent
     default_user: plane
-    default_password: plane
+    # REQUIRED when local_setup=true — no default. Set a strong password here or
+    # supply it via external_secrets.rabbitmq_existingSecret.
+    default_password: ''
     external_rabbitmq_url: ''
     assign_cluster_ip: false
     nodeSelector: {}
@@ -153,7 +158,9 @@ services:
     volumeSize: 5Gi
     pullPolicy: IfNotPresent
     username: plane
-    password: Secure@Pass#123!%^&*
+    # REQUIRED when local_setup=true — no default. Set a strong password here or
+    # supply it via external_secrets.opensearch_existingSecret.
+    password: ''
     memoryLimit: 3Gi
     cpuLimit: 750m
     memoryRequest: 2Gi
@@ -172,7 +179,9 @@ services:
     volumeSize: 3Gi
     pullPolicy: IfNotPresent
     root_user: admin
-    root_password: password
+    # REQUIRED when local_setup=true — no default. Set a strong password here or
+    # supply it via external_secrets.doc_store_existingSecret.
+    root_password: ''
     assign_cluster_ip: false
     env:
       minio_endpoint_ssl: false
@@ -506,7 +515,8 @@ env:
 
   # POSTGRES DB VALUES
   pgdb_username: plane
-  pgdb_password: plane
+  # REQUIRED when postgres.local_setup=true — no default.
+  pgdb_password: ''
   pgdb_name: plane
   pg_pi_db_name: plane_pi
   pgdb_remote_url: '' #INCASE OF REMOTE PG DB URL ONLY
@@ -551,7 +561,9 @@ env:
   opensearch_embedding_dimension: 1536
 
   #API KEYS
-  secret_key: "60gp0byfz2dvffa45cxl20p1scy9xbpf6d8c5y0geejgkyp1b5"
+  # REQUIRED — random signing key, e.g. `openssl rand -base64 32`, or supply via
+  # external_secrets.app_env_existingSecret.
+  secret_key: ''
   api_key_rate_limit: "60/minute"
 
   sentry_dsn: ''
@@ -564,7 +576,8 @@ env:
   live_sentry_dsn: ""
   live_sentry_environment: ""
   live_sentry_traces_sample_rate: ""
-  live_server_secret_key: "htbqvBJAgpm9bzvf3r4urJer0ENReatceh"
+  # REQUIRED — random signing key, or supply via external_secrets.live_env_existingSecret.
+  live_server_secret_key: ''
   external_iframely_url: ""
 
   silo_envs:
@@ -574,8 +587,9 @@ env:
     batch_size: 100
     mq_prefetch_count: 1
     request_interval: 400
-    hmac_secret_key: 'gzb7MRLr0FoN129NyWARZEs84P9LzQ'
-    aes_secret_key: 'dsOdt7YrvxsTIFJ37pOaEVvLxN8KGBCr'
+    # REQUIRED when services.silo.enabled=true — no defaults.
+    hmac_secret_key: ''
+    aes_secret_key: ''
     cors_allowed_origins: ''
 
   email_service_envs:
@@ -617,8 +631,9 @@ env:
     plane_api_host: ''
     follower_postgres_uri: ''
     cors_allowed_origins: ''
-    internal_secret: 'tyfvfqvBJAgpm9bzvf3r4urJer0Ehfdubk'
-    log_level: 'DEBUG'
+    # REQUIRED when services.pi.enabled=true — no default.
+    internal_secret: ''
+    log_level: 'INFO'
 
     celery:
       vector_sync_enabled: false

@@ -48,7 +48,7 @@ spec:
       {{- if include "plane.s3CAEnabled" . }}
       initContainers:
       - name: prepare-ca-bundle
-        image: busybox
+        image: busybox:1.38.0
         {{- include "plane.containerSecurityContext" . }}
         command:
           - /bin/sh
