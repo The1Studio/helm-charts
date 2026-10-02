@@ -26,9 +26,9 @@ stringData:
   {{- else if .Values.services.minio.local_setup }}
   USE_MINIO: "1"
   MINIO_ROOT_USER: {{ .Values.services.minio.root_user | default "admin" | quote }}
-  MINIO_ROOT_PASSWORD: {{ .Values.services.minio.root_password | default "password" | quote}}
+  MINIO_ROOT_PASSWORD: {{ .Values.services.minio.root_password | required "services.minio.root_password is required when services.minio.local_setup=true" | quote}}
   AWS_ACCESS_KEY_ID: {{ .Values.services.minio.root_user | default "admin" | quote }}
-  AWS_SECRET_ACCESS_KEY: {{ .Values.services.minio.root_password | default "password" | quote  }}
+  AWS_SECRET_ACCESS_KEY: {{ .Values.services.minio.root_password | required "services.minio.root_password is required when services.minio.local_setup=true" | quote  }}
   AWS_S3_ENDPOINT_URL: http://{{ .Release.Name }}-minio.{{ .Release.Namespace }}.svc.cluster.local:9000
   {{- else }}
   USE_MINIO: "0"

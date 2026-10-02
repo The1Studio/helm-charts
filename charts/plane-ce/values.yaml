@@ -9,6 +9,9 @@ dockerRegistry:
 ingress:
   enabled: true
   appHost: "plane.example.com"
+  # WARNING: setting minioHost or rabbitmqHost exposes the MinIO console (:9090)
+  # and RabbitMQ management UI (:15672) on the public ingress. Only set these
+  # behind TLS and strong credentials — never expose them on an untrusted network.
   minioHost: ""
   rabbitmqHost: ""
   # Set to "traefik" (or any value starting with "traefik") to deploy native Traefik IngressRoute CRDs
@@ -68,7 +71,9 @@ rabbitmq:
   storageClass: ""
   volumeSize: 100Mi
   default_user: plane
-  default_password: plane
+  # REQUIRED when local_setup=true — no default. Set a strong password here or
+  # supply it via external_secrets.rabbitmq_existingSecret.
+  default_password: ''
   external_rabbitmq_url: ''
   assign_cluster_ip: false
   labels: {}
@@ -82,7 +87,9 @@ minio:
   image_mc: minio/mc:latest
   local_setup: true
   pullPolicy: IfNotPresent
-  root_password: password
+  # REQUIRED when local_setup=true — no default. Set a strong password here or
+  # supply it via external_secrets.doc_store_existingSecret.
+  root_password: ''
   root_user: admin
   storageClass: ""
   volumeSize: 1Gi
@@ -214,7 +221,8 @@ env:
 
   # POSTGRES DB VALUES
   pgdb_username: plane
-  pgdb_password: plane
+  # REQUIRED when postgres.local_setup=true — no default.
+  pgdb_password: ''
   pgdb_name: plane
   pgdb_remote_url: "" #INCASE OF REMOTE PG DB URL ONLY
 
@@ -228,8 +236,10 @@ env:
   aws_region: ""
   aws_s3_endpoint_url: ""
 
-  secret_key: "60gp0byfz2dvffa45cxl20p1scy9xbpf6d8c5y0geejgkyp1b5"
-  live_server_secret_key: "htbqvBJAgpm9bzvf3r4urJer0ENReatceh"
+  # REQUIRED — random signing keys, e.g. `openssl rand -base64 32`, or supply via
+  # external_secrets.app_env_existingSecret / live_env_existingSecret.
+  secret_key: ''
+  live_server_secret_key: ''
 
   sentry_dsn: ""
   sentry_environment: ""

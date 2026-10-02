@@ -98,7 +98,7 @@ spec:
       restartPolicy: OnFailure
       initContainers:
         - name: init
-          image: busybox
+          image: busybox:1.38.0
           command: ['sh', '-c', "until nslookup  {{ .Release.Name }}-minio.{{ .Release.Namespace }}.svc.cluster.local; do echo waiting for  {{ .Release.Name }}-minio; sleep 2; done"]
       containers:
         - name: {{ .Release.Name }}-minio-bucket

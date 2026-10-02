@@ -62,7 +62,7 @@ While creating this role, you need to select the previously saved policy `extern
 | KEY | Value |
 | --- | --- |
 | RABBITMQ_DEFAULT_USER | plane |
-| RABBITMQ_DEFAULT_PASS | plane123 |
+| RABBITMQ_DEFAULT_PASS | (your-rabbitmq-password) |
 
 Save it as e.g `prod/secrets/rabbitmq`
 
@@ -149,7 +149,7 @@ Add the following keys and their respective values:
 | KEY | Value |
 | --- | --- |
 | RABBITMQ_DEFAULT_USER | plane |
-| RABBITMQ_DEFAULT_PASS | plane123 |
+| RABBITMQ_DEFAULT_PASS | (your-rabbitmq-password) |
 
 NOTE: The secret with the Vault token needs to be created in the particular **application_namespace**.
 

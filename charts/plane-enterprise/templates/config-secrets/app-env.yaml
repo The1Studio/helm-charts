@@ -9,10 +9,18 @@ metadata:
   namespace: {{ .Release.Namespace }}
   name: {{ .Release.Name }}-app-secrets
 stringData:
-  SECRET_KEY: {{ .Values.env.secret_key | default "60gp0byfz2dvffa45cxl20p1scy9xbpf6d8c5y0geejgkyp1b5" | quote }}
-  AES_SECRET_KEY: {{ .Values.env.silo_envs.aes_secret_key | default "dsOdt7YrvxsTIFJ37pOaEVvLxN8KGBCr" | quote }}
-  LIVE_SERVER_SECRET_KEY: {{ .Values.env.live_server_secret_key | default "htbqvBJAgpm9bzvf3r4urJer0ENReatceh" | quote }}
-  PI_INTERNAL_SECRET: {{ .Values.env.pi_envs.internal_secret | default "tyfvfqvBJAgpm9bzvf3r4urJer0Ehfdubk" | quote }}
+  SECRET_KEY: {{ .Values.env.secret_key | required "env.secret_key is required: set it in values.yaml or via external_secrets.app_env_existingSecret" | quote }}
+  {{- if or .Values.services.silo.enabled .Values.services.pi.enabled }}
+  AES_SECRET_KEY: {{ .Values.env.silo_envs.aes_secret_key | required "env.silo_envs.aes_secret_key is required when services.silo.enabled or services.pi.enabled is true" | quote }}
+  {{- else }}
+  AES_SECRET_KEY: {{ .Values.env.silo_envs.aes_secret_key | default "" | quote }}
+  {{- end }}
+  LIVE_SERVER_SECRET_KEY: {{ .Values.env.live_server_secret_key | required "env.live_server_secret_key is required: set it in values.yaml or via external_secrets.app_env_existingSecret" | quote }}
+  {{- if .Values.services.pi.enabled }}
+  PI_INTERNAL_SECRET: {{ .Values.env.pi_envs.internal_secret | required "env.pi_envs.internal_secret is required when services.pi.enabled=true" | quote }}
+  {{- else }}
+  PI_INTERNAL_SECRET: {{ .Values.env.pi_envs.internal_secret | default "" | quote }}
+  {{- end }}
 
   {{- if .Values.services.redis.local_setup }}
   REDIS_URL: "redis://{{ .Release.Name }}-redis.{{ .Release.Namespace }}.svc.cluster.local:6379/"
@@ -21,7 +29,7 @@ stringData:
   {{- end }}
 
   {{ if .Values.services.postgres.local_setup }}
-  DATABASE_URL: "postgresql://{{ .Values.env.pgdb_username }}:{{ .Values.env.pgdb_password }}@{{ .Release.Name }}-pgdb.{{ .Release.Namespace }}.svc.cluster.local/{{ .Values.env.pgdb_name }}"
+  DATABASE_URL: "postgresql://{{ .Values.env.pgdb_username }}:{{ .Values.env.pgdb_password | required "env.pgdb_password is required when services.postgres.local_setup=true" }}@{{ .Release.Name }}-pgdb.{{ .Release.Namespace }}.svc.cluster.local/{{ .Values.env.pgdb_name }}"
   {{ else if .Values.env.pgdb_remote_url }}
   DATABASE_URL: {{ .Values.env.pgdb_remote_url}}
   {{ else }}
@@ -33,7 +41,7 @@ stringData:
   {{- end }}
 
   {{- if .Values.services.rabbitmq.local_setup }}
-  AMQP_URL: "amqp://{{ .Values.services.rabbitmq.default_user}}:{{ .Values.services.rabbitmq.default_password}}@{{ .Release.Name }}-rabbitmq.{{ .Release.Namespace }}.svc.{{ .Values.env.default_cluster_domain | default "cluster.local" }}/"
+  AMQP_URL: "amqp://{{ .Values.services.rabbitmq.default_user}}:{{ .Values.services.rabbitmq.default_password | required "services.rabbitmq.default_password is required when services.rabbitmq.local_setup=true" }}@{{ .Release.Name }}-rabbitmq.{{ .Release.Namespace }}.svc.{{ .Values.env.default_cluster_domain | default "cluster.local" }}/"
   {{- else if .Values.services.rabbitmq.external_rabbitmq_url }}
   AMQP_URL: {{ .Values.services.rabbitmq.external_rabbitmq_url}}
   {{- else }}

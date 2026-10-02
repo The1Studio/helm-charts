@@ -6,8 +6,8 @@ metadata:
   namespace: {{ .Release.Namespace }}
   name: {{ .Release.Name }}-app-secrets
 stringData:
-  SECRET_KEY: {{ .Values.env.secret_key | default "60gp0byfz2dvffa45cxl20p1scy9xbpf6d8c5y0geejgkyp1b5" | quote }}
-  LIVE_SERVER_SECRET_KEY: {{ .Values.env.live_server_secret_key | default "htbqvBJAgpm9bzvf3r4urJer0ENReatceh" | quote }}
+  SECRET_KEY: {{ .Values.env.secret_key | required "env.secret_key is required: set it in values.yaml or via external_secrets.app_env_existingSecret" | quote }}
+  LIVE_SERVER_SECRET_KEY: {{ .Values.env.live_server_secret_key | required "env.live_server_secret_key is required: set it in values.yaml or via external_secrets.app_env_existingSecret" | quote }}
 
   {{- if .Values.redis.local_setup }}
   REDIS_URL: "redis://{{ .Release.Name }}-redis.{{ .Release.Namespace }}.svc.{{ .Values.env.default_cluster_domain | default "cluster.local" }}:6379/"
@@ -16,7 +16,7 @@ stringData:
   {{- end }}
 
   {{- if .Values.postgres.local_setup }}
-  DATABASE_URL: "postgresql://{{ .Values.env.pgdb_username }}:{{ .Values.env.pgdb_password }}@{{ .Release.Name }}-pgdb.{{ .Release.Namespace }}.svc.{{ .Values.env.default_cluster_domain | default "cluster.local" }}/{{ .Values.env.pgdb_name }}"
+  DATABASE_URL: "postgresql://{{ .Values.env.pgdb_username }}:{{ .Values.env.pgdb_password | required "env.pgdb_password is required when postgres.local_setup=true" }}@{{ .Release.Name }}-pgdb.{{ .Release.Namespace }}.svc.{{ .Values.env.default_cluster_domain | default "cluster.local" }}/{{ .Values.env.pgdb_name }}"
   {{- else if .Values.env.pgdb_remote_url }}
   DATABASE_URL: {{ .Values.env.pgdb_remote_url}}
   {{- else }}
@@ -24,7 +24,7 @@ stringData:
   {{ end }}
 
   {{- if .Values.rabbitmq.local_setup }}
-  AMQP_URL: "amqp://{{ .Values.rabbitmq.default_user}}:{{ .Values.rabbitmq.default_password}}@{{ .Release.Name }}-rabbitmq.{{ .Release.Namespace }}.svc.{{ .Values.env.default_cluster_domain | default "cluster.local" }}/"
+  AMQP_URL: "amqp://{{ .Values.rabbitmq.default_user}}:{{ .Values.rabbitmq.default_password | required "rabbitmq.default_password is required when rabbitmq.local_setup=true" }}@{{ .Release.Name }}-rabbitmq.{{ .Release.Namespace }}.svc.{{ .Values.env.default_cluster_domain | default "cluster.local" }}/"
   {{- else if .Values.rabbitmq.external_rabbitmq_url }}
   AMQP_URL: {{ .Values.rabbitmq.external_rabbitmq_url}}
   {{- else }}
@@ -48,10 +48,12 @@ data:
   MINIO_ENDPOINT_SSL: {{ .Values.minio.env.minio_endpoint_ssl | default false | ternary "1" "0" | quote }}
   API_KEY_RATE_LIMIT: {{ .Values.env.api_key_rate_limit | default "60/minute" | quote }}
 
-  {{- if .Values.ingress.appHost }}
-  WEB_URL: "http://{{ .Values.ingress.appHost }}"
-  {{- else }}
+  {{- if not .Values.ingress.appHost }}
   WEB_URL: ""
+  {{- else if or .Values.ssl.tls_secret_name (and .Values.ssl.createIssuer .Values.ssl.generateCerts) }}
+  WEB_URL: "https://{{ .Values.ingress.appHost }}"
+  {{- else }}
+  WEB_URL: "http://{{ .Values.ingress.appHost }}"
   {{- end }}
 
 

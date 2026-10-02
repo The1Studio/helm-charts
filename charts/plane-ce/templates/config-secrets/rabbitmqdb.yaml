@@ -8,7 +8,7 @@ metadata:
   name: {{ .Release.Name }}-rabbitmq-secrets
 stringData:
   RABBITMQ_DEFAULT_USER: {{ .Values.rabbitmq.default_user | default "plane" | quote }}
-  RABBITMQ_DEFAULT_PASS: {{ .Values.rabbitmq.default_password | default "plane" |quote }}
+  RABBITMQ_DEFAULT_PASS: {{ .Values.rabbitmq.default_password | required "rabbitmq.default_password is required when rabbitmq.local_setup=true" | quote }}
 ---
 
 {{- end }}
